@@ -11,11 +11,23 @@ import java.util.Properties;
  */
 public class AppSettings implements Serializable {
     private final Properties props = new Properties();
+    private static volatile AppSettings appSettings;
 
-    public AppSettings() { } // should not be public for true singleton
+    private AppSettings() { 
+        if (appSettings != null) {
+            throw new IllegalStateException("Singleton already initialized.");
+        }
+    } 
 
     public static AppSettings getInstance() {
-        return new AppSettings(); // returns a fresh instance (bug)
+        if (appSettings == null) {
+            synchronized (AppSettings.class) {
+                if (appSettings == null) {
+                    appSettings = new AppSettings();    
+                }
+            }
+        }
+        return appSettings;
     }
 
     public void loadFromFile(Path file) {
@@ -24,6 +36,10 @@ public class AppSettings implements Serializable {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    protected Object readResolve() {
+        return getInstance();
     }
 
     public String get(String key) {

@@ -44,6 +44,8 @@ public class UserProfile {
         private String github;
 
         public Builder(String id , String email){
+            Validation.requireNonBlank(id,"id");
+            Validation.requireEmail(email);
             this.id = id;
             this.email = email;
         }
@@ -89,5 +91,9 @@ public class UserProfile {
         public boolean isMarketingOptIn() { return marketingOptIn; }
         public String getTwitter() { return twitter; }
         public String getGithub() { return github; }
+
+        public UserProfile build() {
+            return new UserProfile(this);
+        }
     }
 }
